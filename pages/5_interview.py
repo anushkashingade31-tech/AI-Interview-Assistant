@@ -1,5 +1,6 @@
 import time
 import streamlit as st
+
 from utils.style import load_css
 from utils.sidebar import show_sidebar
 from utils.footer import show_footer
@@ -8,13 +9,16 @@ from ai.interview_ai import generate_questions
 from database.interview_db import create_interview
 from database.answer_db import save_answer
 
+
 st.set_page_config(
     page_title="AI Mock Interview",
     page_icon="💼",
     layout="wide"
 )
+
 load_css()
 show_sidebar()
+
 st.title("💼 AI Mock Interview")
 
 st.caption(
@@ -22,6 +26,8 @@ st.caption(
 )
 
 st.divider()
+
+
 # -------------------------------------
 # Login Check
 # -------------------------------------
@@ -30,6 +36,7 @@ if "user" not in st.session_state:
     st.error("Please login first.")
     st.stop()
 
+
 # -------------------------------------
 # Resume Check
 # -------------------------------------
@@ -37,6 +44,7 @@ if "user" not in st.session_state:
 if "skills" not in st.session_state:
     st.warning("Please upload your resume first.")
     st.stop()
+
 
 # -------------------------------------
 # Generate Questions Only Once
@@ -48,28 +56,27 @@ if "questions" not in st.session_state:
 
     with st.spinner("🤖 AI is preparing your interview..."):
 
-        st.session_state["questions"] = generate_questions(
-            skills
-        )
+        st.session_state["questions"] = generate_questions(skills)
 
-# -------------------------------------
-# Initialize Session
-# -------------------------------------
 
 questions = st.session_state["questions"]
 
 
+# -------------------------------------
+# Initialize Interview
+# -------------------------------------
 
 if "current_question" not in st.session_state:
     st.session_state["current_question"] = 0
 
+
 if "answers" not in st.session_state:
-    st.session_state["answers"] = [
-        ""
-    ] * len(questions)
+    st.session_state["answers"] = [""] * len(questions)
+
 
 if "start_time" not in st.session_state:
     st.session_state["start_time"] = time.time()
+
 
 if "interview_id" not in st.session_state:
 
@@ -80,9 +87,49 @@ if "interview_id" not in st.session_state:
         len(questions)
     )
 
+
+# -------------------------------------
+# Prevent Duplicate Submission
+# -------------------------------------
+
+if "interview_submitted" not in st.session_state:
+    st.session_state["interview_submitted"] = False
+
+
+# -------------------------------------
+# Submit Function
+# -------------------------------------
+
+def submit_interview():
+
+    # Prevent saving the same interview twice
+    if st.session_state["interview_submitted"]:
+        return
+
+    interview_id = st.session_state["interview_id"]
+
+    for i in range(len(questions)):
+
+        save_answer(
+            interview_id,
+            questions[i]["question"],
+            st.session_state["answers"][i]
+        )
+
+    st.session_state["interview_submitted"] = True
+    st.session_state["interview_completed"] = True
+
+    st.switch_page("pages/6_results.py")
+
+
+# -------------------------------------
+# Current Question
+# -------------------------------------
+
 index = st.session_state["current_question"]
 
 total = len(questions)
+
 
 # -------------------------------------
 # Progress
@@ -94,17 +141,16 @@ st.progress(progress)
 
 st.success(
     f"📋 Question {index + 1} of {total} "
-    f"({int(progress*100)}% Completed)"
+    f"({int(progress * 100)}% Completed)"
 )
+
 
 # -------------------------------------
 # Timer
 # -------------------------------------
 
 elapsed = int(
-    time.time()
-    -
-    st.session_state["start_time"]
+    time.time() - st.session_state["start_time"]
 )
 
 remaining = max(
@@ -113,8 +159,8 @@ remaining = max(
 )
 
 minutes = remaining // 60
-
 seconds = remaining % 60
+
 
 if remaining > 300:
 
@@ -133,31 +179,21 @@ else:
     st.error(
         f"🚨 Time Remaining : {minutes:02d}:{seconds:02d}"
     )
-if remaining == 0:
 
-    interview_id = st.session_state["interview_id"]
-
-    for i in range(len(questions)):
-        st.write("Saving:", questions[i]["question"])
-        st.write("Answer:", st.session_state["answers"][i])
-
-        save_answer(
-
-            interview_id,
-
-            questions[i]["question"],
-
-            st.session_state["answers"][i]
-
-        )
-        st.success("Saved successfully")
-
-    st.session_state["interview_completed"] = True
-
-    st.switch_page("pages/6_results.py")
 
 # -------------------------------------
-# Current Question
+# Automatic Submission When Time Ends
+# -------------------------------------
+
+if remaining == 0:
+
+    submit_interview()
+
+    st.stop()
+
+
+# -------------------------------------
+# Display Current Question
 # -------------------------------------
 
 question = questions[index]
@@ -176,14 +212,21 @@ st.markdown(
 
 st.divider()
 
-# Unique key for each question
+
+# -------------------------------------
+# Answer Text Area
+# -------------------------------------
+
 text_key = f"answer_{index}"
 
-# Initialize only once
-if text_key not in st.session_state:
-    st.session_state[text_key] = st.session_state["answers"][index]
 
-# Text area
+if text_key not in st.session_state:
+
+    st.session_state[text_key] = (
+        st.session_state["answers"][index]
+    )
+
+
 st.text_area(
     "✍ Your Answer",
     key=text_key,
@@ -191,14 +234,21 @@ st.text_area(
     placeholder="Type your answer here..."
 )
 
-# Save latest answer
-st.session_state["answers"][index] = st.session_state[text_key]
+
+# Save current answer in session
+st.session_state["answers"][index] = (
+    st.session_state[text_key]
+)
+
+
 # -------------------------------------
 # Navigation
 # -------------------------------------
 
-col1, col2, col3 = st.columns([1,1,1])
+col1, col2, col3 = st.columns(3)
 
+
+# Previous
 with col1:
 
     if st.button(
@@ -208,13 +258,16 @@ with col1:
 
         if index > 0:
 
-            st.session_state["answers"][index] = st.session_state[text_key]
+            st.session_state["answers"][index] = (
+                st.session_state[text_key]
+            )
 
             st.session_state["current_question"] -= 1
 
             st.rerun()
 
 
+# Next
 with col2:
 
     if index < total - 1:
@@ -224,13 +277,16 @@ with col2:
             use_container_width=True
         ):
 
-            st.session_state["answers"][index] = st.session_state[text_key]
+            st.session_state["answers"][index] = (
+                st.session_state[text_key]
+            )
 
             st.session_state["current_question"] += 1
 
             st.rerun()
 
 
+# Submit
 with col3:
 
     if index == total - 1:
@@ -240,23 +296,11 @@ with col3:
             use_container_width=True
         ):
 
-            st.session_state["answers"][index] = st.session_state[text_key]
+            st.session_state["answers"][index] = (
+                st.session_state[text_key]
+            )
 
-            interview_id = st.session_state["interview_id"]
+            submit_interview()
 
-            for i in range(len(questions)):
 
-                save_answer(
-
-                    interview_id,
-
-                    questions[i]["question"],
-
-                    st.session_state["answers"][i]
-
-                )
-
-            st.session_state["interview_completed"] = True
-
-            st.switch_page("pages/6_results.py")
 show_footer()
