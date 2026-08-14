@@ -15,6 +15,7 @@ from database.interview_db import (
     update_overall_score
 )
 
+
 # --------------------------------------------------
 # Page Configuration
 # --------------------------------------------------
@@ -27,6 +28,7 @@ st.set_page_config(
 
 load_css()
 show_sidebar()
+
 
 # --------------------------------------------------
 # Success Animation
@@ -44,6 +46,7 @@ st.caption(
 
 st.divider()
 
+
 # --------------------------------------------------
 # Check Interview
 # --------------------------------------------------
@@ -54,6 +57,7 @@ if "interview_id" not in st.session_state:
 
     st.stop()
 
+
 if "selected_interview" in st.session_state:
 
     interview_id = st.session_state["selected_interview"]
@@ -62,7 +66,13 @@ else:
 
     interview_id = st.session_state["interview_id"]
 
+
+# --------------------------------------------------
+# Get Answers
+# --------------------------------------------------
+
 answers = get_answers(interview_id)
+
 
 if len(answers) == 0:
 
@@ -70,11 +80,13 @@ if len(answers) == 0:
 
     st.stop()
 
+
 # --------------------------------------------------
 # Evaluate Answers
 # --------------------------------------------------
 
 total_score = 0
+
 
 for i, answer in enumerate(answers):
 
@@ -86,76 +98,156 @@ for i, answer in enumerate(answers):
 
     st.subheader("✍ Your Answer")
 
-    st.write(answer["user_answer"])
+    # Display answer
+    if answer["user_answer"] and answer["user_answer"].strip():
 
-    # ------------------------------
+        st.write(answer["user_answer"])
+
+    else:
+
+        st.warning("⚠️ No answer was provided.")
+
+
+    # --------------------------------------------------
     # AI Evaluation
-    # ------------------------------
+    # --------------------------------------------------
 
     if answer["ai_score"] is None:
 
-        with st.spinner("🤖 AI is evaluating your answer..."):
+        user_answer = answer["user_answer"]
 
-            result = evaluate_answer(
 
-                answer["question"],
+        # ----------------------------------------------
+        # EMPTY ANSWER
+        # ----------------------------------------------
 
-                answer["user_answer"]
+        if not user_answer or not user_answer.strip():
 
-            )
+            result = {
 
-            update_answer_evaluation(
+                "score": 0,
 
-                answer["answer_id"],
+                "feedback": (
+                    "No answer was provided for this question."
+                ),
 
-                result["score"],
+                "ideal_answer": (
+                    "Please provide an answer to the question."
+                )
 
-                result["feedback"],
+            }
 
-                result["ideal_answer"]
 
-            )
+        # ----------------------------------------------
+        # ANSWER PROVIDED
+        # ----------------------------------------------
 
-            answer["ai_score"] = result["score"]
+        else:
 
-            answer["feedback"] = result["feedback"]
+            with st.spinner(
+                "🤖 AI is evaluating your answer..."
+            ):
 
-            answer["ideal_answer"] = result["ideal_answer"]
+                result = evaluate_answer(
+
+                    answer["question"],
+
+                    user_answer
+
+                )
+
+
+        # ----------------------------------------------
+        # Save Evaluation
+        # ----------------------------------------------
+
+        update_answer_evaluation(
+
+            answer["answer_id"],
+
+            result["score"],
+
+            result["feedback"],
+
+            result["ideal_answer"]
+
+        )
+
+
+        # Update current answer
+        answer["ai_score"] = result["score"]
+
+        answer["feedback"] = result["feedback"]
+
+        answer["ideal_answer"] = result["ideal_answer"]
+
+
+    # --------------------------------------------------
+    # Calculate Score
+    # --------------------------------------------------
 
     score = float(answer["ai_score"])
 
     total_score += score
 
-    # ------------------------------
-    # Score Color
-    # ------------------------------
+
+    # --------------------------------------------------
+    # Score Display
+    # --------------------------------------------------
 
     if score >= 8:
 
-        st.success(f"🌟 AI Score : {score}/10")
+        st.success(
+            f"🌟 AI Score : {score}/10"
+        )
 
     elif score >= 5:
 
-        st.warning(f"⭐ AI Score : {score}/10")
+        st.warning(
+            f"⭐ AI Score : {score}/10"
+        )
 
     else:
 
-        st.error(f"📚 AI Score : {score}/10")
+        st.error(
+            f"📚 AI Score : {score}/10"
+        )
+
+
+    # --------------------------------------------------
+    # AI Feedback
+    # --------------------------------------------------
 
     st.subheader("💬 AI Feedback")
 
-    st.info(answer["feedback"])
+    st.info(
+        answer["feedback"]
+    )
 
-    with st.expander("📖 View Ideal Answer"):
 
-        st.success(answer["ideal_answer"])
+    # --------------------------------------------------
+    # Ideal Answer
+    # --------------------------------------------------
+
+    with st.expander(
+        "📖 View Ideal Answer"
+    ):
+
+        st.success(
+            answer["ideal_answer"]
+        )
+
 
 # --------------------------------------------------
 # Overall Performance
 # --------------------------------------------------
 
-average_score = total_score / len(answers)
+average_score = (
+    total_score / len(answers)
+)
 
+
+# Save overall score
 update_overall_score(
 
     interview_id,
@@ -164,13 +256,17 @@ update_overall_score(
 
 )
 
+
 percentage = average_score * 10
+
 
 st.divider()
 
 st.header("🏆 Overall Performance")
 
+
 col1, col2 = st.columns(2)
+
 
 with col1:
 
@@ -182,6 +278,7 @@ with col1:
 
     )
 
+
 with col2:
 
     st.metric(
@@ -192,7 +289,11 @@ with col2:
 
     )
 
-st.progress(percentage / 100)
+
+st.progress(
+    percentage / 100
+)
+
 
 # --------------------------------------------------
 # Performance Rating
@@ -200,19 +301,28 @@ st.progress(percentage / 100)
 
 if average_score >= 9:
 
-    st.success("🌟 Excellent Performance")
+    st.success(
+        "🌟 Excellent Performance"
+    )
 
 elif average_score >= 7:
 
-    st.success("✅ Very Good Performance")
+    st.success(
+        "✅ Very Good Performance"
+    )
 
 elif average_score >= 5:
 
-    st.warning("👍 Good Performance")
+    st.warning(
+        "👍 Good Performance"
+    )
 
 else:
 
-    st.error("📚 Needs More Practice")
+    st.error(
+        "📚 Needs More Practice"
+    )
+
 
 # --------------------------------------------------
 # Generate PDF
@@ -221,6 +331,7 @@ else:
 user = st.session_state["user"]
 
 pdf_path = "Interview_Report.pdf"
+
 
 generate_pdf(
 
@@ -233,6 +344,7 @@ generate_pdf(
     pdf_path
 
 )
+
 
 with open(pdf_path, "rb") as file:
 
@@ -250,13 +362,16 @@ with open(pdf_path, "rb") as file:
 
     )
 
+
 # --------------------------------------------------
 # Navigation
 # --------------------------------------------------
 
 st.divider()
 
+
 col1, col2 = st.columns(2)
+
 
 with col1:
 
@@ -269,10 +384,9 @@ with col1:
     ):
 
         st.switch_page(
-
             "pages/7_history.py"
-
         )
+
 
 with col2:
 
@@ -285,9 +399,8 @@ with col2:
     ):
 
         st.switch_page(
-
             "pages/3_dashboard.py"
-
         )
+
 
 show_footer()
