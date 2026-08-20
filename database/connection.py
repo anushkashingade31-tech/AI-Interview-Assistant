@@ -1,5 +1,7 @@
 import mysql.connector
 import streamlit as st
+import os
+
 
 def get_connection():
     return mysql.connector.connect(
@@ -8,5 +10,5 @@ def get_connection():
         user=st.secrets["DB_USER"],
         password=st.secrets["DB_PASSWORD"],
         database=st.secrets["DB_NAME"],
-        ssl_ca=st.secrets["DB_SSL_CA"]
+        ssl_ca=os.path.join(os.getcwd(), "ca.pem")
     )
