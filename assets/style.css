@@ -49,12 +49,18 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid #E2E8F0 !important;
 }
 
-section[data-testid="stSidebar"] * {
+/* Sidebar text - without affecting buttons */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
     color: #334155 !important;
 }
 
 /* Sidebar links */
 section[data-testid="stSidebar"] a {
+    color: #334155 !important;
     border-radius: 8px;
     padding: 8px 10px;
     margin-bottom: 4px;
@@ -62,6 +68,7 @@ section[data-testid="stSidebar"] a {
 
 section[data-testid="stSidebar"] a:hover {
     background-color: #F0FDFA !important;
+    color: #0F766E !important;
 }
 
 /* ---------- Buttons ---------- */
@@ -73,14 +80,32 @@ section[data-testid="stSidebar"] a:hover {
     border: none !important;
     background-color: #0F766E !important;
     color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
     font-size: 15px;
     font-weight: 700 !important;
 }
 
+/* Force all button text/icons to white */
+.stButton > button *,
+.stButton > button p,
+.stButton > button span,
+.stButton > button div {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* Button hover */
 .stButton > button:hover {
     background-color: #115E59 !important;
     color: #FFFFFF !important;
-    border: none !important;
+}
+
+.stButton > button:hover *,
+.stButton > button:hover p,
+.stButton > button:hover span,
+.stButton > button:hover div {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
 }
 
 /* ---------- Input Fields ---------- */
