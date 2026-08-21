@@ -1,93 +1,203 @@
-/* ================================
+/* ==========================================
    AI Interview Preparation Assistant
-   Soft Light Professional Theme
-================================ */
+   Professional Soft Light Theme
+========================================== */
 
-/* Main App */
-.main {
-    background-color: #F9FBFF;
+/* ---------- Main App ---------- */
+
+html,
+body,
+[data-testid="stAppViewContainer"],
+.stApp {
+    background-color: #F8FAFC !important;
+    color: #1E293B !important;
 }
 
-/* Main Headings */
-.main h1,
-.main h2,
-.main h3 {
-    color: #1E293B;
+/* Main content area */
+.main .block-container {
+    padding-top: 2.5rem;
+    padding-bottom: 2rem;
 }
 
-/* Normal Text */
-.main p {
+/* ---------- Headings ---------- */
+
+h1,
+h2,
+h3 {
+    color: #0F172A !important;
+    font-weight: 700 !important;
+}
+
+h1 {
+    font-size: 2.2rem !important;
+}
+
+h2 {
+    font-size: 1.6rem !important;
+}
+
+p,
+li,
+span,
+label {
     color: #475569;
 }
 
-/* Buttons */
-.stButton > button {
-    width: 100%;
-    height: 44px;
-    border-radius: 8px;
-    border: none;
-    background-color: #4F8EF7;
-    color: white;
-    font-size: 15px;
-    font-weight: 600;
-}
+/* ---------- Sidebar ---------- */
 
-.stButton > button:hover {
-    background-color: #3B7DE3;
-    color: white;
-}
-
-/* Input Fields */
-input,
-textarea {
+section[data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
-    border: 1px solid #DCE6F2 !important;
-    border-radius: 8px !important;
+    border-right: 1px solid #E2E8F0 !important;
+}
+
+section[data-testid="stSidebar"] * {
     color: #334155 !important;
 }
 
-/* Metric Cards */
-[data-testid="stMetric"] {
-    background-color: #FFFFFF;
-    padding: 20px;
-    border-radius: 14px;
-    border: 1px solid #EDF2F7;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background-color: #F4F7FB;
-    border-right: 1px solid #E5EAF0;
-}
-
-/* Sidebar Text */
-section[data-testid="stSidebar"] * {
-    color: #334155;
-}
-
-/* Sidebar Heading */
-section[data-testid="stSidebar"] h1 {
-    color: #1E3A5F;
-}
-
-/* Sidebar Navigation */
-section[data-testid="stSidebar"] a {
-    padding: 9px 10px;
+/* Sidebar navigation */
+section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] {
     border-radius: 8px;
-    transition: 0.2s;
+    margin-bottom: 4px;
+    padding: 6px 10px;
 }
 
-section[data-testid="stSidebar"] a:hover {
-    background-color: #E8F1FF;
+section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"]:hover {
+    background-color: #EFF6FF !important;
 }
 
-/* Horizontal Divider */
+/* Active navigation item */
+section[data-testid="stSidebar"] [aria-current="page"] {
+    background-color: #E8F1FF !important;
+    border-radius: 8px;
+}
+
+/* ---------- Buttons ---------- */
+
+.stButton > button {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 8px;
+    border: none;
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.stButton > button:hover {
+    background-color: #1D4ED8 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+}
+
+/* ---------- Input Fields ---------- */
+
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stNumberInput"] input,
+[data-baseweb="input"] input {
+    background-color: #FFFFFF !important;
+    color: #1E293B !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 8px !important;
+}
+
+/* Input focus */
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus,
+[data-testid="stNumberInput"] input:focus {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ---------- Select Boxes ---------- */
+
+[data-baseweb="select"] > div {
+    background-color: #FFFFFF !important;
+    color: #1E293B !important;
+    border-color: #CBD5E1 !important;
+}
+
+/* ---------- Metric Cards ---------- */
+
+[data-testid="stMetric"] {
+    background-color: #FFFFFF !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #64748B !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #0F172A !important;
+}
+
+/* ---------- Expanders ---------- */
+
+[data-testid="stExpander"] {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+}
+
+/* ---------- File Uploader ---------- */
+
+[data-testid="stFileUploader"] {
+    background-color: #FFFFFF;
+    border-radius: 10px;
+}
+
+/* ---------- Alerts ---------- */
+
+[data-testid="stAlert"] {
+    border-radius: 10px;
+}
+
+/* ---------- Dividers ---------- */
+
 hr {
-    border-color: #E5EAF0;
+    border-color: #E2E8F0 !important;
 }
 
-/* Captions */
+/* ---------- Captions ---------- */
+
 [data-testid="stCaptionContainer"] {
-    color: #64748B;
+    color: #64748B !important;
+}
+
+/* ---------- Dataframes / Tables ---------- */
+
+[data-testid="stDataFrame"] {
+    background-color: #FFFFFF !important;
+    border-radius: 10px;
+}
+
+/* ---------- Links ---------- */
+
+a {
+    color: #2563EB !important;
+}
+
+/* ---------- Scrollbar ---------- */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F8FAFC;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
 }
