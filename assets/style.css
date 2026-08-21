@@ -74,17 +74,18 @@ section[data-testid="stSidebar"] a:hover {
     min-height: 44px;
     border-radius: 8px;
     border: none !important;
-    background-color: #2563EB !important;
+    background-color: #5B8DEF !important;
     color: #FFFFFF !important;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700 !important;
+    text-shadow: none !important;
 }
 
 .stButton > button:hover {
-    background-color: #1D4ED8 !important;
+    background-color: #4A7FE0 !important;
     color: #FFFFFF !important;
+    border: none !important;
 }
-
 /* ---------- Input Fields ---------- */
 
 [data-testid="stTextInput"] input,
