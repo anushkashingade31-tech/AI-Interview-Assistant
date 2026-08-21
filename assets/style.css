@@ -1,9 +1,18 @@
 /* ==========================================
    AI Interview Preparation Assistant
-   Professional Soft Light Theme
+   Professional Light Theme
 ========================================== */
 
-/* ---------- Main App ---------- */
+/* Hide Streamlit's default multipage navigation */
+[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+[data-testid="stSidebarNavItems"] {
+    display: none !important;
+}
+
+/* ---------- Main Application ---------- */
 
 html,
 body,
@@ -13,7 +22,7 @@ body,
     color: #1E293B !important;
 }
 
-/* Main content area */
+/* Main content spacing */
 .main .block-container {
     padding-top: 2.5rem;
     padding-bottom: 2rem;
@@ -28,14 +37,7 @@ h3 {
     font-weight: 700 !important;
 }
 
-h1 {
-    font-size: 2.2rem !important;
-}
-
-h2 {
-    font-size: 1.6rem !important;
-}
-
+/* Normal text */
 p,
 li,
 span,
@@ -54,21 +56,15 @@ section[data-testid="stSidebar"] * {
     color: #334155 !important;
 }
 
-/* Sidebar navigation */
-section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] {
+/* Sidebar links */
+section[data-testid="stSidebar"] a {
     border-radius: 8px;
+    padding: 8px 10px;
     margin-bottom: 4px;
-    padding: 6px 10px;
 }
 
-section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"]:hover {
+section[data-testid="stSidebar"] a:hover {
     background-color: #EFF6FF !important;
-}
-
-/* Active navigation item */
-section[data-testid="stSidebar"] [aria-current="page"] {
-    background-color: #E8F1FF !important;
-    border-radius: 8px;
 }
 
 /* ---------- Buttons ---------- */
@@ -77,38 +73,33 @@ section[data-testid="stSidebar"] [aria-current="page"] {
     width: 100%;
     min-height: 44px;
     border-radius: 8px;
-    border: none;
+    border: none !important;
     background-color: #2563EB !important;
     color: #FFFFFF !important;
     font-size: 15px;
     font-weight: 600;
-    transition: 0.2s ease;
 }
 
 .stButton > button:hover {
     background-color: #1D4ED8 !important;
     color: #FFFFFF !important;
-    border: none !important;
 }
 
 /* ---------- Input Fields ---------- */
 
 [data-testid="stTextInput"] input,
 [data-testid="stTextArea"] textarea,
-[data-testid="stNumberInput"] input,
-[data-baseweb="input"] input {
+[data-testid="stNumberInput"] input {
     background-color: #FFFFFF !important;
     color: #1E293B !important;
     border: 1px solid #CBD5E1 !important;
     border-radius: 8px !important;
 }
 
-/* Input focus */
 [data-testid="stTextInput"] input:focus,
 [data-testid="stTextArea"] textarea:focus,
 [data-testid="stNumberInput"] input:focus {
     border-color: #2563EB !important;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12) !important;
 }
 
 /* ---------- Select Boxes ---------- */
@@ -148,7 +139,7 @@ section[data-testid="stSidebar"] [aria-current="page"] {
 /* ---------- File Uploader ---------- */
 
 [data-testid="stFileUploader"] {
-    background-color: #FFFFFF;
+    background-color: #FFFFFF !important;
     border-radius: 10px;
 }
 
@@ -158,7 +149,7 @@ section[data-testid="stSidebar"] [aria-current="page"] {
     border-radius: 10px;
 }
 
-/* ---------- Dividers ---------- */
+/* ---------- Divider ---------- */
 
 hr {
     border-color: #E2E8F0 !important;
@@ -170,7 +161,7 @@ hr {
     color: #64748B !important;
 }
 
-/* ---------- Dataframes / Tables ---------- */
+/* ---------- Tables ---------- */
 
 [data-testid="stDataFrame"] {
     background-color: #FFFFFF !important;
