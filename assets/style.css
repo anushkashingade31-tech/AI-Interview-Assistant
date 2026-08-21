@@ -4,10 +4,7 @@
 ========================================== */
 
 /* Hide Streamlit's default multipage navigation */
-[data-testid="stSidebarNav"] {
-    display: none !important;
-}
-
+[data-testid="stSidebarNav"],
 [data-testid="stSidebarNavItems"] {
     display: none !important;
 }
@@ -64,7 +61,7 @@ section[data-testid="stSidebar"] a {
 }
 
 section[data-testid="stSidebar"] a:hover {
-    background-color: #EFF6FF !important;
+    background-color: #F0FDFA !important;
 }
 
 /* ---------- Buttons ---------- */
@@ -74,18 +71,18 @@ section[data-testid="stSidebar"] a:hover {
     min-height: 44px;
     border-radius: 8px;
     border: none !important;
-    background-color: #5B8DEF !important;
+    background-color: #0F766E !important;
     color: #FFFFFF !important;
     font-size: 15px;
     font-weight: 700 !important;
-    text-shadow: none !important;
 }
 
 .stButton > button:hover {
-    background-color: #4A7FE0 !important;
+    background-color: #115E59 !important;
     color: #FFFFFF !important;
     border: none !important;
 }
+
 /* ---------- Input Fields ---------- */
 
 [data-testid="stTextInput"] input,
@@ -100,7 +97,7 @@ section[data-testid="stSidebar"] a:hover {
 [data-testid="stTextInput"] input:focus,
 [data-testid="stTextArea"] textarea:focus,
 [data-testid="stNumberInput"] input:focus {
-    border-color: #2563EB !important;
+    border-color: #0F766E !important;
 }
 
 /* ---------- Select Boxes ---------- */
@@ -172,7 +169,7 @@ hr {
 /* ---------- Links ---------- */
 
 a {
-    color: #2563EB !important;
+    color: #0F766E !important;
 }
 
 /* ---------- Scrollbar ---------- */
