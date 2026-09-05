@@ -20,4 +20,4 @@ def generate_questions(skills):
 
     data = json.loads(response)
 
-    return data["questions"]
+    return data["questions"][:10]
