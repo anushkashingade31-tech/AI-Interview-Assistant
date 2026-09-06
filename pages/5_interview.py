@@ -7,6 +7,7 @@ from utils.footer import show_footer
 
 from ai.interview_ai import generate_questions
 from ai.groq_client import transcribe_audio
+from ai.voice_analysis import analyze_voice
 
 from database.interview_db import create_interview
 from database.answer_db import save_answer
@@ -27,10 +28,11 @@ show_sidebar()
 
 
 # --------------------------------------------------
-# PAGE TITLE
+# TITLE
 # --------------------------------------------------
 
 st.title("💼 AI Mock Interview")
+
 st.caption(
     "Answer every question carefully. AI will evaluate your performance."
 )
@@ -48,7 +50,7 @@ if "user" not in st.session_state:
 
 
 # --------------------------------------------------
-# RESUME / SKILLS CHECK
+# SKILLS CHECK
 # --------------------------------------------------
 
 if "skills" not in st.session_state:
@@ -57,7 +59,7 @@ if "skills" not in st.session_state:
 
 
 # --------------------------------------------------
-# GENERATE INTERVIEW QUESTIONS
+# GENERATE QUESTIONS
 # --------------------------------------------------
 
 if "questions" not in st.session_state:
@@ -69,20 +71,14 @@ if "questions" not in st.session_state:
         st.session_state["questions"] = generate_questions(skills)
 
 
-questions = st.session_state["questions"]
-
-
-# --------------------------------------------------
-# MAKE SURE ONLY 10 QUESTIONS ARE USED
-# --------------------------------------------------
-
-questions = questions[:10]
+# Keep only 10 questions
+questions = st.session_state["questions"][:10]
 
 st.session_state["questions"] = questions
 
 
 # --------------------------------------------------
-# INITIALIZE CURRENT QUESTION
+# CURRENT QUESTION
 # --------------------------------------------------
 
 if "current_question" not in st.session_state:
@@ -90,16 +86,15 @@ if "current_question" not in st.session_state:
 
 
 # --------------------------------------------------
-# INITIALIZE ANSWERS
+# ANSWERS
 # --------------------------------------------------
 
 if "answers" not in st.session_state:
-
     st.session_state["answers"] = [""] * len(questions)
 
 
 # --------------------------------------------------
-# INTERVIEW TIMER
+# TIMER
 # --------------------------------------------------
 
 if "start_time" not in st.session_state:
@@ -107,7 +102,7 @@ if "start_time" not in st.session_state:
 
 
 # --------------------------------------------------
-# CREATE INTERVIEW RECORD
+# CREATE INTERVIEW
 # --------------------------------------------------
 
 if "interview_id" not in st.session_state:
@@ -121,7 +116,7 @@ if "interview_id" not in st.session_state:
 
 
 # --------------------------------------------------
-# INTERVIEW SUBMISSION STATUS
+# SUBMISSION STATUS
 # --------------------------------------------------
 
 if "interview_submitted" not in st.session_state:
@@ -129,7 +124,7 @@ if "interview_submitted" not in st.session_state:
 
 
 # --------------------------------------------------
-# SUBMIT INTERVIEW FUNCTION
+# SUBMIT INTERVIEW
 # --------------------------------------------------
 
 def submit_interview():
@@ -154,7 +149,7 @@ def submit_interview():
 
 
 # --------------------------------------------------
-# CURRENT QUESTION
+# QUESTION INFORMATION
 # --------------------------------------------------
 
 index = st.session_state["current_question"]
@@ -177,12 +172,17 @@ st.success(
 
 
 # --------------------------------------------------
-# TIMER
+# TIMER DISPLAY
 # --------------------------------------------------
 
-elapsed = int(time.time() - st.session_state["start_time"])
+elapsed = int(
+    time.time() - st.session_state["start_time"]
+)
 
-remaining = max(0, 600 - elapsed)
+remaining = max(
+    0,
+    600 - elapsed
+)
 
 minutes = remaining // 60
 seconds = remaining % 60
@@ -208,7 +208,7 @@ else:
 
 
 # --------------------------------------------------
-# AUTO SUBMIT WHEN TIME ENDS
+# AUTO SUBMIT
 # --------------------------------------------------
 
 if remaining == 0:
@@ -218,14 +218,12 @@ if remaining == 0:
 
 
 # --------------------------------------------------
-# QUESTION
+# DISPLAY QUESTION
 # --------------------------------------------------
 
 question = questions[index]
 
-
 st.subheader(f"📝 Question {index + 1}")
-
 
 st.markdown(
     f"""
@@ -236,7 +234,6 @@ st.markdown(
 **⭐ Difficulty:** {question['difficulty']}
 """
 )
-
 
 st.divider()
 
@@ -263,10 +260,7 @@ st.text_area(
 )
 
 
-# --------------------------------------------------
-# SAVE CURRENT TEXT ANSWER
-# --------------------------------------------------
-
+# Save text answer
 st.session_state["answers"][index] = (
     st.session_state[text_key]
 )
@@ -290,6 +284,10 @@ audio = st.audio_input(
 )
 
 
+# --------------------------------------------------
+# CONVERT VOICE TO TEXT + ANALYZE VOICE
+# --------------------------------------------------
+
 if audio is not None:
 
     st.audio(audio)
@@ -300,23 +298,41 @@ if audio is not None:
     ):
 
         with st.spinner(
-            "🤖 Converting your voice to text..."
+            "🤖 Converting and analyzing your voice..."
         ):
 
             try:
 
+                # ----------------------------------
+                # STEP 1: Speech to Text
+                # ----------------------------------
+
                 transcript = transcribe_audio(audio)
 
-                # Store transcript separately.
-                # Do NOT directly modify answer_0,
-                # answer_1, etc. because those are
-                # Streamlit widget keys.
+
+                # ----------------------------------
+                # STEP 2: Voice Analysis
+                # ----------------------------------
+
+                voice_result = analyze_voice(
+                    audio,
+                    transcript
+                )
+
+
+                # ----------------------------------
+                # STEP 3: Store Results
+                # ----------------------------------
 
                 st.session_state["voice_transcript"] = transcript
 
+                st.session_state["voice_analysis"] = voice_result
+
+
                 st.success(
-                    "✅ Voice converted to text successfully!"
+                    "✅ Voice converted and analyzed successfully!"
                 )
+
 
             except Exception as e:
 
@@ -326,7 +342,7 @@ if audio is not None:
 
 
 # --------------------------------------------------
-# SHOW TRANSCRIPTION
+# DISPLAY TRANSCRIPT
 # --------------------------------------------------
 
 if "voice_transcript" in st.session_state:
@@ -340,6 +356,76 @@ if "voice_transcript" in st.session_state:
         disabled=True
     )
 
+
+# --------------------------------------------------
+# DISPLAY VOICE ANALYSIS
+# --------------------------------------------------
+
+if "voice_analysis" in st.session_state:
+
+    result = st.session_state["voice_analysis"]
+
+
+    if "error" not in result:
+
+        st.divider()
+
+        st.subheader("🎙️ Voice Analysis")
+
+
+        # ------------------------------------------
+        # Voice Metrics
+        # ------------------------------------------
+
+        col1, col2, col3 = st.columns(3)
+
+
+        with col1:
+
+            st.metric(
+                "Speaking Pace",
+                result["speaking_pace"]
+            )
+
+
+        with col2:
+
+            st.metric(
+                "Pauses",
+                result["pause_count"]
+            )
+
+
+        with col3:
+
+            st.metric(
+                "Voice Energy",
+                f'{result["voice_energy"]}%'
+            )
+
+
+        # ------------------------------------------
+        # Confidence Indicator
+        # ------------------------------------------
+
+        st.metric(
+            "Confidence Indicator",
+            f'{result["confidence_indicator"]}%'
+        )
+
+
+        st.caption(
+            "The confidence indicator is an estimate based "
+            "on speaking pace, pauses, silence and voice energy."
+        )
+
+
+# --------------------------------------------------
+# USE VOICE ANSWER
+# --------------------------------------------------
+
+if "voice_transcript" in st.session_state:
+
     if st.button(
         "📥 Use This Answer",
         use_container_width=True
@@ -349,26 +435,38 @@ if "voice_transcript" in st.session_state:
             "voice_transcript"
         ]
 
+
+        # Save transcript as current answer
         st.session_state["answers"][index] = transcript
 
+
+        # Remove temporary voice data
         del st.session_state["voice_transcript"]
 
+
+        if "voice_analysis" in st.session_state:
+
+            # Keep voice analysis for later use
+            pass
+
+
         st.success(
-            "✅ Answer added successfully!"
+            "✅ Voice answer added successfully!"
         )
+
 
         st.rerun()
 
 
 # --------------------------------------------------
-# NAVIGATION BUTTONS
+# NAVIGATION
 # --------------------------------------------------
 
 col1, col2, col3 = st.columns(3)
 
 
 # --------------------------------------------------
-# PREVIOUS BUTTON
+# PREVIOUS
 # --------------------------------------------------
 
 with col1:
@@ -384,17 +482,21 @@ with col1:
                 st.session_state[text_key]
             )
 
-            st.session_state["current_question"] -= 1
-
-            # Remove previous voice transcript
+            # Clear temporary voice transcript
             if "voice_transcript" in st.session_state:
                 del st.session_state["voice_transcript"]
+
+            # Clear voice analysis
+            if "voice_analysis" in st.session_state:
+                del st.session_state["voice_analysis"]
+
+            st.session_state["current_question"] -= 1
 
             st.rerun()
 
 
 # --------------------------------------------------
-# NEXT BUTTON
+# NEXT
 # --------------------------------------------------
 
 with col2:
@@ -410,10 +512,13 @@ with col2:
                 st.session_state[text_key]
             )
 
-            # Remove voice transcript before
-            # moving to another question
+            # Clear temporary voice transcript
             if "voice_transcript" in st.session_state:
                 del st.session_state["voice_transcript"]
+
+            # Clear voice analysis
+            if "voice_analysis" in st.session_state:
+                del st.session_state["voice_analysis"]
 
             st.session_state["current_question"] += 1
 
@@ -421,7 +526,7 @@ with col2:
 
 
 # --------------------------------------------------
-# SUBMIT BUTTON
+# SUBMIT
 # --------------------------------------------------
 
 with col3:
