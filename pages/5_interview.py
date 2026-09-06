@@ -94,6 +94,14 @@ if "answers" not in st.session_state:
 
 
 # --------------------------------------------------
+# VOICE ANALYSIS FOR EACH QUESTION
+# --------------------------------------------------
+
+if "voice_analyses" not in st.session_state:
+    st.session_state["voice_analyses"] = [None] * len(questions)
+
+
+# --------------------------------------------------
 # TIMER
 # --------------------------------------------------
 
@@ -139,7 +147,8 @@ def submit_interview():
         save_answer(
             interview_id,
             questions[i]["question"],
-            st.session_state["answers"][i]
+            st.session_state["answers"][i],
+            st.session_state["voice_analyses"][i]
         )
 
     st.session_state["interview_submitted"] = True
@@ -303,36 +312,23 @@ if audio is not None:
 
             try:
 
-                # ----------------------------------
-                # STEP 1: Speech to Text
-                # ----------------------------------
-
+                # Speech to Text
                 transcript = transcribe_audio(audio)
 
-
-                # ----------------------------------
-                # STEP 2: Voice Analysis
-                # ----------------------------------
-
+                # Voice Analysis
                 voice_result = analyze_voice(
                     audio,
                     transcript
                 )
 
-
-                # ----------------------------------
-                # STEP 3: Store Results
-                # ----------------------------------
-
+                # Store temporarily
                 st.session_state["voice_transcript"] = transcript
 
                 st.session_state["voice_analysis"] = voice_result
 
-
                 st.success(
                     "✅ Voice converted and analyzed successfully!"
                 )
-
 
             except Exception as e:
 
@@ -365,20 +361,13 @@ if "voice_analysis" in st.session_state:
 
     result = st.session_state["voice_analysis"]
 
-
     if "error" not in result:
 
         st.divider()
 
         st.subheader("🎙️ Voice Analysis")
 
-
-        # ------------------------------------------
-        # Voice Metrics
-        # ------------------------------------------
-
         col1, col2, col3 = st.columns(3)
-
 
         with col1:
 
@@ -387,14 +376,12 @@ if "voice_analysis" in st.session_state:
                 result["speaking_pace"]
             )
 
-
         with col2:
 
             st.metric(
                 "Pauses",
                 result["pause_count"]
             )
-
 
         with col3:
 
@@ -403,16 +390,10 @@ if "voice_analysis" in st.session_state:
                 f'{result["voice_energy"]}%'
             )
 
-
-        # ------------------------------------------
-        # Confidence Indicator
-        # ------------------------------------------
-
         st.metric(
             "Confidence Indicator",
             f'{result["confidence_indicator"]}%'
         )
-
 
         st.caption(
             "The confidence indicator is an estimate based "
@@ -431,29 +412,34 @@ if "voice_transcript" in st.session_state:
         use_container_width=True
     ):
 
-        transcript = st.session_state[
-            "voice_transcript"
-        ]
+        transcript = st.session_state["voice_transcript"]
 
-
-        # Save transcript as current answer
+        # Save transcript
         st.session_state["answers"][index] = transcript
 
-
-        # Remove temporary voice data
-        del st.session_state["voice_transcript"]
-
-
+        # Save voice analysis for THIS question
         if "voice_analysis" in st.session_state:
 
-            # Keep voice analysis for later use
-            pass
+            result = st.session_state["voice_analysis"]
 
+            if "error" not in result:
+
+                st.session_state["voice_analyses"][index] = result
+
+        # Remove temporary data
+        del st.session_state["voice_transcript"]
+
+        if "voice_analysis" in st.session_state:
+            del st.session_state["voice_analysis"]
+
+        # Remove old text widget value
+        # so the transcript appears in the text area
+        if text_key in st.session_state:
+            del st.session_state[text_key]
 
         st.success(
             "✅ Voice answer added successfully!"
         )
-
 
         st.rerun()
 
@@ -482,11 +468,10 @@ with col1:
                 st.session_state[text_key]
             )
 
-            # Clear temporary voice transcript
+            # Clear temporary voice data
             if "voice_transcript" in st.session_state:
                 del st.session_state["voice_transcript"]
 
-            # Clear voice analysis
             if "voice_analysis" in st.session_state:
                 del st.session_state["voice_analysis"]
 
@@ -512,11 +497,10 @@ with col2:
                 st.session_state[text_key]
             )
 
-            # Clear temporary voice transcript
+            # Clear temporary voice data
             if "voice_transcript" in st.session_state:
                 del st.session_state["voice_transcript"]
 
-            # Clear voice analysis
             if "voice_analysis" in st.session_state:
                 del st.session_state["voice_analysis"]
 
